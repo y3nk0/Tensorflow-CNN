@@ -120,7 +120,7 @@ with tf.Graph().as_default():
 
         # Define Training procedure
         global_step = tf.Variable(0, name="global_step", trainable=False)
-        optimizer = tf.train.AdamOptimizer(0.0001)
+        optimizer = tf.train.AdamOptimizer(0.001)
         # optimizer = tf.train.AdadeltaOptimizer(0.95)
         grads_and_vars = optimizer.compute_gradients(cnn.loss)
         # train_op = optimizer.apply_gradients(grads_and_vars, global_step=global_step)
@@ -128,7 +128,7 @@ with tf.Graph().as_default():
         # optimizer = tf.train.AdadeltaOptimizer(0.001)
         # # optimizer = tf.train.AdamOptimizer(learning_rate=1e-4)
         # grads_and_vars = optimizer.compute_gradients(cnn.loss)
-        grads_and_vars = [(tf.clip_by_norm(grad, 0, 3.0), var) for grad, var in grads_and_vars]
+
         train_op = optimizer.apply_gradients(grads_and_vars,global_step=global_step)
 
         # Keep track of gradient values and sparsity (optional)
@@ -186,17 +186,14 @@ with tf.Graph().as_default():
             reverse_vocabulary = idx_to_word
             vocabulary = word_to_idx
 
-            voc_keys = list(vocabulary.keys())
-
-            from gensim.models.word2vec import Word2Vec
-            model = Word2Vec(min_count=1, size=300)
-            model.build_vocab([voc_keys])
-            model.intersect_word2vec_format(FLAGS.word2vec, binary=True)
+           from gensim.models import KeyedVectors
+           model = gensim.models.KeyedVectors.load_word2vec_format(FLAGS.word2vec, binary=True)
 
             w2vW=np.empty((vocab_size,FLAGS.embedding_dim))
             w2vW[0] = 0
             for i in range(1,len(reverse_vocabulary)):
                 w2vW[i]=model[reverse_vocabulary[i]] if reverse_vocabulary[i] in model else 2*(np.random.rand(FLAGS.embedding_dim)-0.5)
+            del model
             sess.run(cnn.W.assign(w2vW))
 
         def train_step(x_batch, y_batch):

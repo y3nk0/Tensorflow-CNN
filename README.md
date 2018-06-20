@@ -1,6 +1,6 @@
 It is slightly simplified implementation of Kim's [Convolutional Neural Networks for Sentence Classification](http://arxiv.org/abs/1408.5882) paper in Tensorflow and is based upon Denny Britz implementation.
 
-Our repo includes all code for both pre-split and cross-validation datasets
+Our repo includes code for both pre-split and cross-validation datasets
  - zero output weights
  - initial padding
  - learning rate
